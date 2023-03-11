@@ -68,7 +68,7 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	fileIdHex := res.InsertedID.(primitive.ObjectID).Hex()
-	hostname := "http://localhost:8000"
+	hostname := os.Getenv("ENDPOINT")
 	url := hostname + "/s/" + fileIdHex
 	myResp := UploadResponse{
 		Url: url,
