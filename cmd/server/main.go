@@ -13,7 +13,6 @@ import (
 
 func main() {
 	myArgs := os.Args[1:]
-	fmt.Println(myArgs)
 	if len(myArgs) < 1 || myArgs[0] != "server" {
 		utils.LoadENV()
 	}

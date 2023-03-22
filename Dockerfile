@@ -8,7 +8,7 @@ WORKDIR /go/src/app
 COPY . .
 
 # Install required packages for building sqlite driver
-RUN apk add --no-cache git gcc musl-dev
+RUN apk add git gcc musl-dev
 
 # Download dependencies
 RUN go mod download
@@ -20,7 +20,7 @@ RUN CGO_ENABLED=1 GOOS=linux GOARCH=arm64 GOARM=7 go build -ldflags="-s -w" -o /
 FROM alpine:latest
 
 # Install SQLite
-RUN apk --no-cache add ca-certificates sqlite
+RUN apk add ca-certificates sqlite
 
 # Set the working directory to /app
 WORKDIR /app

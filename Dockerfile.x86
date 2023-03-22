@@ -49,4 +49,4 @@ COPY ./scripts/wait-for.sh .
 RUN chmod +x ./wait-for.sh
 
 # Command to run when starting the container
-CMD ["./wait-for.sh", "mongo:27017", "--", "./main"]
+CMD ["./wait-for.sh", "mongo:27017", "--", "./main", "server"]
