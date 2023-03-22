@@ -36,6 +36,11 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(handler.Filename)
 	fileOptions := strings.Split(handler.Filename, ".")
 	filePath := "media/" + fileOptions[0] + time.Now().Format("_2006_01_02_15_04_05") + "." + fileOptions[1] + ".gz"
+	err = os.MkdirAll("media", os.ModePerm)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	f, err := os.Create(filePath)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
