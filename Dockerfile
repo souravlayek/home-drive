@@ -13,8 +13,10 @@ RUN apk add --no-cache git gcc musl-dev
 # Download dependencies
 RUN go mod download
 
+ENV ENV_TYPE=server
+
 # Build the Go app
-RUN CGO_ENABLED=1 GOOS=linux GOARCH=arm64 GOARM=7 ENV_TYPE=server go build -ldflags="-s -w" -o /go/bin/app cmd/server/main.go
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=arm64 GOARM=7 go build -ldflags="-s -w" -o /go/bin/app cmd/server/main.go
 
 # Use an official Alpine Linux image as a parent image
 FROM alpine:latest

@@ -13,6 +13,7 @@ import (
 
 func main() {
 	myArgs := os.Getenv("ENV_TYPE")
+	fmt.Println(myArgs)
 	if len(myArgs) < 1 || myArgs == "server" {
 		utils.LoadENV()
 	}
