@@ -12,8 +12,8 @@ import (
 )
 
 func main() {
-	myArgs := os.Args[1:]
-	if len(myArgs) < 1 || myArgs[0] == "server" {
+	myArgs := os.Getenv("ENV_TYPE")
+	if len(myArgs) < 1 || myArgs == "server" {
 		utils.LoadENV()
 	}
 	hostname := os.Getenv("ENDPOINT")
