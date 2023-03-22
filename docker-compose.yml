@@ -4,8 +4,6 @@ services:
   server:
     build: ./DockerFile.arm
     ports:
-      - "8000:8000"
-    depends_on:
-      - mongo
+      - "8001:8000"
     environment:
       ENDPOINT: https://images.codevizon.com
