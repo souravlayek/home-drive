@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  server:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongo
+    environment:
+      ENDPOINT: <DOMAIN NAME SO THAT GETTING FILE PATH PROPERLY>
+  # mongo:
+  #   image: mongo:latest
+  #   restart: always
+  #   ports:
+  #     - "<exposePort>:27017"
+  # swagger:
+    # image: swaggerapi/swagger-ui
+    # ports:
+    #   - "8080:8080"
+    # volumes:
+    #   - ./swagger:/usr/share/nginx/html/swagger
+    # environment:
+    #   API_URL: http://server:8000/docs/swagger.yaml
+    # depends_on:
+    #   - api
