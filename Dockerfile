@@ -13,8 +13,6 @@ RUN apk add --no-cache git gcc musl-dev
 # Download dependencies
 RUN go mod download
 
-ENV ENV_TYPE=server
-
 # Build the Go app
 RUN CGO_ENABLED=1 GOOS=linux GOARCH=arm64 GOARM=7 go build -ldflags="-s -w" -o /go/bin/app cmd/server/main.go
 
@@ -40,4 +38,4 @@ RUN chmod +x wait-for.sh
 EXPOSE 8000
 
 # Start the Go app
-CMD ["./app"]
+CMD ["./app", "server"]

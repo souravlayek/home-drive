@@ -7,6 +7,5 @@ services:
       - "8001:8000"
     environment:
       ENDPOINT: https://images.codevizon.com
-      ENV_TYPE: server
     volumes:
       - ./media:/media

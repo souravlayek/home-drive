@@ -24,4 +24,4 @@ jobs:
     - name: Build
       run: go build -v ./cmd/server/
     - name: Deploy
-      run: docker compose up -d
+      run: docker compose up -d --build
