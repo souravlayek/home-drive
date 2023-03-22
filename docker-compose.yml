@@ -2,8 +2,10 @@ version: "3.9"
 
 services:
   server:
-    build: ./DockerFile.arm
+    build: .
     ports:
       - "8001:8000"
     environment:
       ENDPOINT: https://images.codevizon.com
+    volumes:
+      - ./media:/app/media
