@@ -9,4 +9,4 @@ services:
       ENDPOINT: https://images.codevizon.com
       MONGO_URL: mongodb+srv://souravlayek:7oIYsm1GfyDCKd30@cluster0.ncxolee.mongodb.net/?retryWrites=true&w=majority
     volumes:
-      - ./media:/app/media
+      - ~/home-drive/media:/app/media
