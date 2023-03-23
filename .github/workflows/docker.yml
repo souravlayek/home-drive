@@ -28,7 +28,7 @@ jobs:
         context: .
         push: true
         platforms: linux/arm64
-        tags: your-docker-username/your-repo-name:${{ github.sha }}
+        tags: souravlayek/home-drive:${{ github.sha }}
 
     # - name: Deploy to Kubernetes
     #   uses: appleboy/kubectl-action@master
