@@ -4,12 +4,14 @@ import (
 	"compress/flate"
 	"context"
 	"encoding/json"
-	"fmt"
+	"image"
 	"io"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/buckket/go-blurhash"
 
 	"github.com/souravlayek/storage-server/internal/database"
 	"github.com/souravlayek/storage-server/internal/model"
@@ -17,7 +19,8 @@ import (
 )
 
 type UploadResponse struct {
-	Url string `json:"url"`
+	Url      string `json:"url"`
+	Blurhash string `json:"blurhash"`
 }
 
 func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
@@ -33,7 +36,6 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
-	fmt.Println(handler.Filename)
 	fileOptions := strings.Split(handler.Filename, ".")
 	filePath := "media/" + fileOptions[0] + time.Now().Format("_2006_01_02_15_04_05") + "." + fileOptions[1] + ".gz"
 	err = os.MkdirAll("media", os.ModePerm)
@@ -47,7 +49,23 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer f.Close()
+	// Check whether uploaded file is image from filename
+	isFileImage := strings.Contains(handler.Filename, ".jpg") || strings.Contains(handler.Filename, ".jpeg") || strings.Contains(handler.Filename, ".png")
+	var blurHashStr = ""
+	if isFileImage {
+		// Decode the image
+		img, _, err := image.Decode(file)
+		if err != nil {
+			panic(err)
+		}
 
+		// Generate blurhash
+		blurHashStr, err = blurhash.Encode(4, 3, img)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
 	compressor, err := flate.NewWriter(f, flate.BestCompression)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -62,9 +80,10 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 
 	// File written successfully
 	myMetaData := model.MetaData{
-		Id:   primitive.NewObjectID(),
-		Name: handler.Filename,
-		Path: filePath,
+		Id:       primitive.NewObjectID(),
+		Name:     handler.Filename,
+		Path:     filePath,
+		BlurHash: blurHashStr,
 	}
 	res, err := database.MetaDataCollection.InsertOne(context.TODO(), myMetaData)
 	if err != nil {
@@ -76,7 +95,8 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	hostname := os.Getenv("ENDPOINT")
 	url := hostname + "/s/" + fileIdHex
 	myResp := UploadResponse{
-		Url: url,
+		Url:      url,
+		Blurhash: blurHashStr,
 	}
 	json.NewEncoder(w).Encode(myResp)
 }

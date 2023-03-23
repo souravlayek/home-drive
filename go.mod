@@ -11,6 +11,7 @@ require (
 )
 
 require (
+	github.com/buckket/go-blurhash v1.1.0
 	github.com/disintegration/imaging v1.6.2
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/gorilla/mux v1.8.0
