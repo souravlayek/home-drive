@@ -9,6 +9,7 @@ services:
       - mongo
     environment:
       ENDPOINT: <DOMAIN NAME SO THAT GETTING FILE PATH PROPERLY>
+      MONGO_URI: <MONGO DB URL>
   # mongo:
   #   image: mongo:latest
   #   restart: always

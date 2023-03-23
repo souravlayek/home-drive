@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,10 +15,11 @@ var MetaDataCollection *mongo.Collection
 
 func ConnectDB() {
 	dbName := "storage"
+	mongoURL := os.Getenv("MONGO_URL")
 
 	serverAPIOptions := options.ServerAPI(options.ServerAPIVersion1)
 	clientOptions := options.Client().
-		ApplyURI("mongodb://localhost:27017").
+		ApplyURI(mongoURL).
 		SetServerAPIOptions(serverAPIOptions)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
