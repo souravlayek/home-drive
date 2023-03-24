@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"image"
 	"io"
+	"io/fs"
 	"net/http"
 	"os"
 	"strconv"
@@ -60,7 +61,12 @@ func DownloadFile(w http.ResponseWriter, r *http.Request) {
 	defer inputFile.Close()
 	gzipReader := flate.NewReader(inputFile)
 	defer gzipReader.Close()
-	tmpfile, err := os.CreateTemp("media", "decompressed-*."+fileExtension)
+	err = os.Mkdir("temp", fs.ModePerm)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	tmpfile, err := os.CreateTemp("temp", "decompressed-*."+fileExtension)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
