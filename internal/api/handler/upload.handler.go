@@ -5,6 +5,8 @@ import (
 	"context"
 	"encoding/json"
 	"image"
+	_ "image/jpeg"
+	_ "image/png"
 	"io"
 	"net/http"
 	"os"
@@ -12,7 +14,6 @@ import (
 	"time"
 
 	"github.com/buckket/go-blurhash"
-
 	"github.com/souravlayek/storage-server/internal/database"
 	"github.com/souravlayek/storage-server/internal/model"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -20,7 +21,7 @@ import (
 
 type UploadResponse struct {
 	Url      string `json:"url"`
-	Blurhash string `json:"blurhash"`
+	BlurHash string `json:"blurhash"`
 }
 
 func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
@@ -49,23 +50,7 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer f.Close()
-	// Check whether uploaded file is image from filename
-	isFileImage := strings.Contains(handler.Filename, ".jpg") || strings.Contains(handler.Filename, ".jpeg") || strings.Contains(handler.Filename, ".png")
-	var blurHashStr = ""
-	if isFileImage {
-		// Decode the image
-		img, _, err := image.Decode(file)
-		if err != nil {
-			panic(err)
-		}
 
-		// Generate blurhash
-		blurHashStr, err = blurhash.Encode(4, 3, img)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	}
 	compressor, err := flate.NewWriter(f, flate.BestCompression)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -77,13 +62,32 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	isFileImage := strings.Contains(handler.Filename, ".jpg") || strings.Contains(handler.Filename, ".jpeg") || strings.Contains(handler.Filename, ".png")
+	var myBlurHash string
+	if isFileImage {
+		_, err = file.Seek(0, io.SeekStart)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		img, _, err := image.Decode(file)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		myBlurHash, err = blurhash.Encode(4, 3, img)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
 
 	// File written successfully
 	myMetaData := model.MetaData{
 		Id:       primitive.NewObjectID(),
 		Name:     handler.Filename,
 		Path:     filePath,
-		BlurHash: blurHashStr,
+		BlurHash: myBlurHash,
 	}
 	res, err := database.MetaDataCollection.InsertOne(context.TODO(), myMetaData)
 	if err != nil {
@@ -96,7 +100,7 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	url := hostname + "/s/" + fileIdHex
 	myResp := UploadResponse{
 		Url:      url,
-		Blurhash: blurHashStr,
+		BlurHash: myBlurHash,
 	}
 	json.NewEncoder(w).Encode(myResp)
 }
