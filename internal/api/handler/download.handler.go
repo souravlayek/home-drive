@@ -61,7 +61,7 @@ func DownloadFile(w http.ResponseWriter, r *http.Request) {
 	defer inputFile.Close()
 	gzipReader := flate.NewReader(inputFile)
 	defer gzipReader.Close()
-	err = os.Mkdir("temp", fs.ModePerm)
+	err = os.MkdirAll("temp", fs.ModePerm)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -71,7 +71,7 @@ func DownloadFile(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if (fileExtension == "jpg" || fileExtension == "png") && (size != 0 || width != 0) {
+	if (fileExtension == "jpg" || fileExtension == "png" || fileExtension == "jpeg") && (size != 0 || width != 0) {
 		file, _, err := image.Decode(gzipReader)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
